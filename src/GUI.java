@@ -339,11 +339,19 @@ public class GUI extends Application{
 
 	//Ruoan poisto tietokannasta
 	public void removeButtonClicked() {
-		ObservableList<Ruoka> productSelected, allProducts;
-		allProducts = table.getItems();
-		productSelected = table.getSelectionModel().getSelectedItems();
-
-		productSelected.forEach(allProducts::remove);
+		try {
+			Connection myConn = DBconnect.dbConnector();
+			
+			String query = "DELETE FROM aine WHERE nimi = ? ";
+			PreparedStatement pst = myConn.prepareStatement(query);
+			pst.setString(1, nameInput.getText());
+			pst.executeUpdate();
+			nameInput.clear();
+			refreshTable();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 
