@@ -1,0 +1,15 @@
+TODO
+
+-"Etsi" varmaan päivitysongelma
+-"Poista" ei pysyvä -> muodosta yhteys tauluun
+
+Päivän ateriat:
+	-määrä, jonka perusteella laskee energian
+	-määrän tulee olla muokattavissa
+	-energia, joka saadaan määrä * proteiini * hiilari * rasva
+	-koko päivän kalorisaanti
+	-paljonko +/-
+	-tiedosto joka lataa päivän ateriat
+	-"lisää listaan" toimii muttei pysyvä
+	-"poista listasta" toimii muttei pysyvä
+	-joutuuko tekemään oman taulukon?
