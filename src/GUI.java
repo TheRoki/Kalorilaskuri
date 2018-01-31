@@ -1,5 +1,5 @@
 /**
- * GUI-luokka, joka toteuttaa graafisen k‰yttˆliittym‰n ohjelman suoritukselle
+ * GUI-luokka, joka toteuttaa graafisen k√§ytt√∂liittym√§n ohjelman suoritukselle
  *
  * @author Roope Ilvonen
  * @version 1.00 2017/4/25
@@ -127,8 +127,8 @@ public class GUI extends Application{
 		fatInput = new TextField();
 		fatInput.setPromptText("Rasva");
 
-		//Lis‰‰ nappi
-		Button addButton = new Button("Lis‰‰");
+		//Lis√§√§ nappi
+		Button addButton = new Button("Lis√§√§");
 		addButton.setOnAction(e -> addButtonClicked());
 
 		// Poista nappi
@@ -154,7 +154,7 @@ public class GUI extends Application{
 		hboxi.setSpacing(1);
 		hboxi.getChildren().addAll(filterField);
 
-		Button lisaaButton = new Button("Lis‰‰ listaan");
+		Button lisaaButton = new Button("Lis√§√§ listaan");
 		lisaaButton.setOnAction(e -> lisaaButtonClicked());
 
 		VBox vBox = new VBox();
@@ -178,9 +178,9 @@ public class GUI extends Application{
 		nameColumn2.setCellValueFactory(new PropertyValueFactory<>("nimi"));
 
 		//Calorie column
-		TableColumn<Ruoka, Double> syotymaara = new TableColumn<>("M‰‰r‰");
+		TableColumn<Ruoka, Double> syotymaara = new TableColumn<>("M√§√§r√§");
 		syotymaara.setMinWidth(200);
-		syotymaara.setCellValueFactory(new PropertyValueFactory<>("m‰‰r‰"));
+		syotymaara.setCellValueFactory(new PropertyValueFactory<>("m√§√§r√§"));
 
 		//Calorie column
 		TableColumn<Ruoka, Double> calorieColumn2 = new TableColumn<>("Energia");
@@ -225,20 +225,20 @@ public class GUI extends Application{
 		vBox2.getChildren().addAll(table2, hBox2, kuluttaa);
 
 
-		//Luodaan kysymyskent‰t
+		//Luodaan kysymyskent√§t
 		GridPane paneeli = new GridPane();
 
 		paneeli.add(new Label("Sukupuoli"),0,0);
-		paneeli.add(new Label("Ik‰: "), 0, 3);
+		paneeli.add(new Label("Ik√§: "), 0, 3);
 		paneeli.add(new Label("v"), 3, 3);
 		paneeli.add(new Label("Pituus: "), 0, 4);
 		paneeli.add(new Label("cm"), 3, 4);
 		paneeli.add(new Label("Paino: "), 0, 5);
 		paneeli.add(new Label("kg"), 3, 5);
 		paneeli.add(new Label ("Aktiivisuustaso"), 0, 6);
-		paneeli.add(new Label ("P‰iv‰n liikunta (min.)"), 0, 11);
-		paneeli.add(new Label ("Kevytt‰ liikuntaa (k‰vely)"), 0, 12);
-		paneeli.add(new Label ("Kohtalaista liikuntaa (reipas k‰vely)"), 0, 13);
+		paneeli.add(new Label ("P√§iv√§n liikunta (min.)"), 0, 11);
+		paneeli.add(new Label ("Kevytt√§ liikuntaa (k√§vely)"), 0, 12);
+		paneeli.add(new Label ("Kohtalaista liikuntaa (reipas k√§vely)"), 0, 13);
 		paneeli.add(new Label ("Kuormittavaa liikuntaa (kuntosali)"), 0, 14);
 		paneeli.add(new Label ("Raskasta liikuntaa (juoksulenkki)"), 0, 15);
 		paneeli.add(new Label ("Kulutuksesi on:"), 0, 17);
@@ -255,11 +255,11 @@ public class GUI extends Application{
 		ToggleGroup aktiviteettiGroup = new ToggleGroup();
 		RadioButton todellakevytRadio = new RadioButton("Todella kevyt (oleilua)");
 		todellakevytRadio.setToggleGroup(aktiviteettiGroup);
-		RadioButton kevytRadio = new RadioButton("Kevyt (istumatyˆskentely‰)");
+		RadioButton kevytRadio = new RadioButton("Kevyt (istumaty√∂skentely√§)");
 		kevytRadio.setToggleGroup(aktiviteettiGroup);
 		RadioButton kohtalainenRadio = new RadioButton("Kohtalainen (seisomista ja liikkumista jonkin verran)");
 		kohtalainenRadio.setToggleGroup(aktiviteettiGroup);
-		RadioButton raskasRadio = new RadioButton("Raskas (fyysisesti raskas tyˆ)");
+		RadioButton raskasRadio = new RadioButton("Raskas (fyysisesti raskas ty√∂)");
 		raskasRadio.setToggleGroup(aktiviteettiGroup);
 
 		// Laske kulutus
@@ -316,7 +316,7 @@ public class GUI extends Application{
 
 	}
 
-	// Ruoan lis‰ys tietokantaan
+	// Ruoan lis√§ys tietokantaan
 	public void addButtonClicked() {
 		try {
 			Connection myConn = DBconnect.dbConnector();
@@ -347,19 +347,19 @@ public class GUI extends Application{
 	}
 
 
-	//P‰iv‰n ateriat
+	//P√§iv√§n ateriat
 	public ObservableList<Ruoka> getDaily() {
 		//lataa tiedosto
 		ObservableList<Ruoka> ruokaa = FXCollections.observableArrayList();
 		ruokaa.add(new Ruoka("olut", 34.2, 434, 44, 24));
-		ruokaa.add(new Ruoka("p‰hkin‰", 33.5, 124, 44, 24));
+		ruokaa.add(new Ruoka("p√§hkin√§", 33.5, 124, 44, 24));
 		ruokaa.add(new Ruoka("oivariini", 278, 23, 1, 34));
 
 		return ruokaa;
 	}
 
 
-	//Ruoan lis‰ys p‰iv‰n aterioihin
+	//Ruoan lis√§ys p√§iv√§n aterioihin
 	public void lisaaButtonClicked() {
 		ObservableList<Ruoka> productSelected;
 		productSelected = table.getSelectionModel().getSelectedItems();
@@ -367,7 +367,7 @@ public class GUI extends Application{
 
 	}
 
-	//Ruoan poisto p‰iv‰n aterioista
+	//Ruoan poisto p√§iv√§n aterioista
 	public void poistaButtonClicked() {
 
 		ObservableList<Ruoka> productSelected, allProducts;
