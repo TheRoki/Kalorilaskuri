@@ -13,9 +13,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -46,7 +48,7 @@ public class GUI extends Application{
 	Stage window;
 	TableView<Ruoka> table;
 	TableView<Ruoka> table2;
-	final ObservableList<Ruoka> masterData = FXCollections.observableArrayList();
+	final ObservableList<Ruoka> ruoat = FXCollections.observableArrayList();
 
 	TextField nameInput, calorieInput, proteinInput, carbInput, fatInput, filterField, kalorimaara;
 
@@ -137,8 +139,12 @@ public class GUI extends Application{
 
 		filterField = new TextField();
 		filterField.setPromptText("Etsi ruoka listasta");
-		Button etsiButton = new Button("Etsi");
-		etsiButton.setOnAction(e -> getData());
+
+		filterField.textProperty().addListener(new ChangeListener() {
+			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+				etsiButtonClicked((String) oldValue, (String) newValue);
+			}
+		});
 
 		HBox hBox = new HBox();
 		hBox.setPadding(new Insets(1, 1, 1, 1));
@@ -152,7 +158,7 @@ public class GUI extends Application{
 		HBox hboxi = new HBox();
 		hboxi.setPadding(new Insets(1, 1, 1, 1));
 		hboxi.setSpacing(1);
-		hboxi.getChildren().addAll(filterField, etsiButton);
+		hboxi.getChildren().addAll(filterField);
 
 		Button lisaaButton = new Button("Lisää listaan");
 		lisaaButton.setOnAction(e -> lisaaButtonClicked());
@@ -298,31 +304,20 @@ public class GUI extends Application{
 		window.show();
 	}
 	// Ruoka-aineiden suodatus
-	public void etsiButtonClicked() {
-		try {
-		conn = DBconnect.dbConnector();
-		Statement myStmt = conn.createStatement();
-		String query = "SELECT * FROM aine WHERE nimi = '" + filterField.getText() + "' ";
-
-		myStmt.executeUpdate(query);
-
-		table.setItems(getData());
-		conn.close();
-		
-		/*
-		ObservableList<Ruoka> ruoat = FXCollections.observableArrayList();
-		try {
-			Connection myConn = DBconnect.dbConnector();
-			Statement myStmt = myConn.createStatement();
-			ResultSet myRs = myStmt.executeQuery("SELECT * FROM aine WHERE nimi = '" + filterField.getText() + "' ");
-
-			while (myRs.next()) {
-				ruoat.add(new Ruoka(myRs.getString("nimi"),myRs.getDouble("kcal"), myRs.getDouble("proteiini"), myRs.getDouble("hiilihydraatti"), myRs.getDouble("rasva")));
+	public void etsiButtonClicked(String oldValue, String newValue) {
+		ObservableList<Ruoka> filteredList = FXCollections.observableArrayList();
+		if (filterField == null || (newValue.length() < oldValue.length()) || newValue == null) {
+			table.setItems(ruoat);
+		}
+		else {
+			newValue = newValue.toUpperCase();
+			for(Ruoka ruuat : table.getItems()) {
+				String filterFirstName = ruuat.getNimi();
+				if(filterFirstName.toUpperCase().contains(newValue)) {
+					filteredList.add(ruuat);
+				}
 			}
-			myConn.close();
-			*/
-		} catch (Exception e) {
-			e.printStackTrace();
+			table.setItems(filteredList);
 		}
 	}
 
@@ -353,10 +348,10 @@ public class GUI extends Application{
 		try {
 			conn = DBconnect.dbConnector();
 			Statement myStmt = conn.createStatement();
-			String query = "DELETE FROM aine WHERE nimi =  '" + nameInput.getText() + "' ";	
-			
-			myStmt.executeUpdate(query);	
-			
+			String query = "DELETE FROM aine WHERE nimi =  '" + nameInput.getText() + "' ";
+
+			myStmt.executeUpdate(query);
+
 			nameInput.clear();
 			table.setItems(getData());
 			conn.close();
@@ -400,14 +395,19 @@ public class GUI extends Application{
 
 	// Valitsee kaikki ruoat
 	public ObservableList<Ruoka> getData() {
-		ObservableList<Ruoka> ruoat = FXCollections.observableArrayList();
 		try {
 			conn = DBconnect.dbConnector();
 			Statement myStmt = conn.createStatement();
 			ResultSet myRs = myStmt.executeQuery("SELECT * FROM aine");
-			
-			
-			
+			/*
+			if (filterField.getText().isEmpty()){
+				myRs = myStmt.executeQuery("SELECT * FROM aine");
+			}
+			else {
+				myRs = myStmt.executeQuery("SELECT * FROM aine WHERE nimi = '" + filterField.getText() + "' ");
+			}
+			*/
+
 			while (myRs.next()) {
 				ruoat.add(new Ruoka(myRs.getString("nimi"),myRs.getDouble("kcal"), myRs.getDouble("proteiini"), myRs.getDouble("hiilihydraatti"), myRs.getDouble("rasva")));
 			}
