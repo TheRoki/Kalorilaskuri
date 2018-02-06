@@ -353,8 +353,9 @@ public class GUI extends Application{
 			myStmt.executeUpdate(query);
 
 			nameInput.clear();
-			table.setItems(getData());
+			
 			conn.close();
+			table.setItems(getData());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -396,6 +397,7 @@ public class GUI extends Application{
 	// Valitsee kaikki ruoat
 	public ObservableList<Ruoka> getData() {
 		try {
+			ruoat.clear();
 			conn = DBconnect.dbConnector();
 			Statement myStmt = conn.createStatement();
 			ResultSet myRs = myStmt.executeQuery("SELECT * FROM aine");
