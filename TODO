@@ -6,7 +6,9 @@ Päivän ateriat:
 	-energia, joka saadaan määrä * proteiini * hiilari * rasva
 	-koko päivän kalorisaanti
 	-paljonko +/-
+	-makrot
 	-tiedosto joka lataa päivän ateriat
-	-"lisää listaan" toimii muttei pysyvä
-	-"poista listasta" toimii muttei pysyvä
-	-joutuuko tekemään oman taulukon?
+		-tallennus toimii
+		-lataus ei
+	-"lisää listaan" toimii
+	-"poista listasta" vaatii parserin Ruoka -> Ruokalista, mutta "toimii"
