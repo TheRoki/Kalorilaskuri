@@ -5,14 +5,20 @@
  * @version 1.00 2017/4/25
  */
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -20,11 +26,16 @@ import javafx.collections.ObservableList;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -34,6 +45,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -44,11 +57,16 @@ import javafx.stage.Stage;
  */
 public class GUI extends Application{
 	Connection conn;
+	private Scanner x;
 
 	Stage window;
 	TableView<Ruoka> table;
-	TableView<Ruoka> table2;
+	TableView<Ruokalista> table2;
 	final ObservableList<Ruoka> ruoat = FXCollections.observableArrayList();
+	ObservableList<Ruokalista> ruokalista = FXCollections.observableArrayList();
+	MenuBar fileMenu;
+
+	File file = new File ("C:\\Users\\Roope\\workspace\\Parityo\\ruokalista");
 
 	TextField nameInput, calorieInput, proteinInput, carbInput, fatInput, filterField, kalorimaara;
 
@@ -179,32 +197,37 @@ public class GUI extends Application{
 		 *
 		 */
 		//Name column
-		TableColumn<Ruoka, String> nameColumn2 = new TableColumn<>("Ruoka-aine");
+		TableColumn<Ruokalista, String> nameColumn2 = new TableColumn<>("Ruoka-aine");
 		nameColumn2.setMinWidth(200);
 		nameColumn2.setCellValueFactory(new PropertyValueFactory<>("nimi"));
 
-		//Calorie column
-		TableColumn<Ruoka, Double> syotymaara = new TableColumn<>("Määrä");
-		syotymaara.setMinWidth(200);
-		syotymaara.setCellValueFactory(new PropertyValueFactory<>("määrä"));
+		//Quantity column
+		TableColumn<Ruokalista, Double> quantityColumn = new TableColumn<>("Määrä");
+		quantityColumn.setMinWidth(200);
+		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("maara"));
+
+		//Energy column
+		TableColumn<Ruokalista, Double> energyColumn = new TableColumn<>("Energia");
+		energyColumn.setMinWidth(200);
+		energyColumn.setCellValueFactory(new PropertyValueFactory<>("energia"));
 
 		//Calorie column
-		TableColumn<Ruoka, Double> calorieColumn2 = new TableColumn<>("Energia");
+		TableColumn<Ruokalista, Double> calorieColumn2 = new TableColumn<>("Kcal/100g");
 		calorieColumn2.setMinWidth(200);
 		calorieColumn2.setCellValueFactory(new PropertyValueFactory<>("kalori"));
 
 		//Protein column
-		TableColumn<Ruoka, Double> proteinColumn2 = new TableColumn<>("Proteiini");
+		TableColumn<Ruokalista, Double> proteinColumn2 = new TableColumn<>("Proteiini");
 		proteinColumn2.setMinWidth(200);
 		proteinColumn2.setCellValueFactory(new PropertyValueFactory<>("proteiini"));
 
 		//Carb column
-		TableColumn<Ruoka, Double> carbColumn2 = new TableColumn<>("Hiilihydraatti");
+		TableColumn<Ruokalista, Double> carbColumn2 = new TableColumn<>("Hiilihydraatti");
 		carbColumn2.setMinWidth(200);
 		carbColumn2.setCellValueFactory(new PropertyValueFactory<>("hiilihydraatti"));
 
 		//Fat column
-		TableColumn<Ruoka, Double> fatColumn2 = new TableColumn<>("Rasva");
+		TableColumn<Ruokalista, Double> fatColumn2 = new TableColumn<>("Rasva");
 		fatColumn2.setMinWidth(200);
 		fatColumn2.setCellValueFactory(new PropertyValueFactory<>("rasva"));
 
@@ -223,8 +246,20 @@ public class GUI extends Application{
 
 		table2 = new TableView<>();
 		table2.setItems(getDaily());
-		table2.getColumns().addAll(nameColumn2, syotymaara, calorieColumn2, proteinColumn2, carbColumn2, fatColumn2);
+		table2.getColumns().addAll(nameColumn2, quantityColumn, energyColumn, calorieColumn2, proteinColumn2, carbColumn2, fatColumn2);
 
+		/*
+		 *
+		 *
+		 *
+		 *
+		table2.setEditable(true);
+		quantityColumn.setOnEditCommit(e -> maaraCol_OnEditCommit(e));
+		*
+		*
+		*
+		*
+		*/
 		Label kuluttaa = new Label("Paino muuttuu noin xxx viikossa");
 
 		VBox vBox2 = new VBox();
@@ -298,6 +333,10 @@ public class GUI extends Application{
 		border.setRight(paneeli);
 		border.setBottom(vBox2);
 
+		// Ohjelman loppuessa tallentaa ruokalistan
+		primaryStage.setOnCloseRequest(event -> {
+			handleSave();
+		});
 
 		Scene scene = new Scene(border, 1400, 900);
 		window.setScene(scene);
@@ -353,7 +392,7 @@ public class GUI extends Application{
 			myStmt.executeUpdate(query);
 
 			nameInput.clear();
-			
+
 			conn.close();
 			table.setItems(getData());
 
@@ -364,35 +403,59 @@ public class GUI extends Application{
 
 
 	//Päivän ateriat
-	public ObservableList<Ruoka> getDaily() {
-		//lataa tiedosto
-		ObservableList<Ruoka> ruokaa = FXCollections.observableArrayList();
-		ruokaa.add(new Ruoka("olut", 34.2, 434, 44, 24));
-		ruokaa.add(new Ruoka("pähkinä", 33.5, 124, 44, 24));
-		ruokaa.add(new Ruoka("oivariini", 278, 23, 1, 34));
+	public ObservableList<Ruokalista> getDaily() {
+		ruokalista.add(new Ruokalista("olut", 10, 10, 10, 10, 10, 10));
+		ruokalista.add(new Ruokalista("pähkinä", 100.5, 33.5, 33.5, 124, 44, 24));
+		ruokalista.add(new Ruokalista("oivariini", 278.3, 45.5, 45, 23, 1, 34));
+		
+		
 
-		return ruokaa;
+		return ruokalista;
 	}
 
 
 	//Ruoan lisäys päivän aterioihin
 	public void lisaaButtonClicked() {
-		ObservableList<Ruoka> productSelected;
-		productSelected = table.getSelectionModel().getSelectedItems();
-		table2.getItems().addAll(productSelected);
 
+		//TODO GET SELECTED FROM table TO table2 <Ruoka> -> <Ruokalista>
+
+		ruokalista.addAll(table2.getSelectionModel().getSelectedItems());
+		table2.getSelectionModel().clearSelection();
 	}
 
 	//Ruoan poisto päivän aterioista
 	public void poistaButtonClicked() {
-
-		ObservableList<Ruoka> productSelected, allProducts;
-		allProducts = table2.getItems();
-		productSelected = table2.getSelectionModel().getSelectedItems();
-
-		productSelected.forEach(allProducts::remove);
+		ruokalista.removeAll(table2.getSelectionModel().getSelectedItems());
+		table2.getSelectionModel().clearSelection();
 	}
 
+	//Ruoan määrän muokkauksen käsittely
+	public void maaraCol_OnEditCommit(Event e) {
+		TableColumn.CellEditEvent<Ruokalista, Double> cellEditEvent;
+		cellEditEvent = (TableColumn.CellEditEvent<Ruokalista, Double>) e;
+		Ruokalista ruokalista = cellEditEvent.getRowValue();
+		ruokalista.setMaara(cellEditEvent.getNewValue());
+	}
+
+	//Tallentaa ruokalistaan lisätyt ruoat
+	public void handleSave() {
+		saveFile(table2.getItems(), file);
+	}
+
+	public void saveFile(ObservableList<Ruokalista> ruokaa, File file) {
+		try {
+			BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
+
+			for (Ruokalista ruokalista : ruokaa) {
+				outWriter.write(ruokalista.toString());
+				outWriter.newLine();
+			}
+			outWriter.close();
+
+		} catch (IOException e) {
+
+		}
+	}
 
 	// Valitsee kaikki ruoat
 	public ObservableList<Ruoka> getData() {
@@ -401,14 +464,6 @@ public class GUI extends Application{
 			conn = DBconnect.dbConnector();
 			Statement myStmt = conn.createStatement();
 			ResultSet myRs = myStmt.executeQuery("SELECT * FROM aine");
-			/*
-			if (filterField.getText().isEmpty()){
-				myRs = myStmt.executeQuery("SELECT * FROM aine");
-			}
-			else {
-				myRs = myStmt.executeQuery("SELECT * FROM aine WHERE nimi = '" + filterField.getText() + "' ");
-			}
-			*/
 
 			while (myRs.next()) {
 				ruoat.add(new Ruoka(myRs.getString("nimi"),myRs.getDouble("kcal"), myRs.getDouble("proteiini"), myRs.getDouble("hiilihydraatti"), myRs.getDouble("rasva")));
@@ -433,10 +488,6 @@ public class GUI extends Application{
 				Integer.parseInt(tfKohtalainen.getText()),
 				Integer.parseInt(tfKuormittava.getText()),
 				Integer.parseInt(tfRaskas.getText()));
-
-		/*
-		 *
-		 */
 
 		tfKulutus.setText(String.valueOf(kulutus));
 	}
