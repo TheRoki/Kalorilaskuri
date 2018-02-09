@@ -10,5 +10,4 @@ Päivän ateriat:
 	-tiedosto joka lataa päivän ateriat
 		-tallennus toimii
 		-lataus ei
-	-"lisää listaan" toimii
 	-"poista listasta" vaatii parserin Ruoka -> Ruokalista, mutta "toimii"
