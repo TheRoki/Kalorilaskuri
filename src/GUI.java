@@ -5,16 +5,25 @@
  * @version 1.00 2017/4/25
  */
 
+import java.awt.Desktop;
+import javafx.beans.property.SimpleStringProperty;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import javafx.application.Application;
@@ -28,6 +37,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -37,10 +47,12 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -48,6 +60,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.converter.NumberStringConverter;
 
 /**
  *
@@ -65,6 +78,7 @@ public class GUI extends Application{
 	final ObservableList<Ruoka> ruoat = FXCollections.observableArrayList();
 	ObservableList<Ruokalista> ruokalista = FXCollections.observableArrayList();
 	MenuBar fileMenu;
+	private Desktop desktop = Desktop.getDesktop();
 
 	File file = new File ("C:\\Users\\Roope\\workspace\\Parityo\\ruokalista");
 
@@ -202,9 +216,26 @@ public class GUI extends Application{
 		nameColumn2.setCellValueFactory(new PropertyValueFactory<>("nimi"));
 
 		//Quantity column
-		TableColumn<Ruokalista, Double> quantityColumn = new TableColumn<>("Määrä");
+		//TableColumn<Ruokalista, String> quantityColumn = new TableColumn<>("Määrä");
+		//quantityColumn.setMinWidth(200);
+		//quantityColumn.setCellValueFactory(new PropertyValueFactory<>("maara"));
+
+		TableColumn quantityColumn = new TableColumn("Määrä");
 		quantityColumn.setMinWidth(200);
-		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("maara"));
+		quantityColumn.setCellValueFactory(
+				new PropertyValueFactory<Ruokalista, Double>("maara"));
+		// Määrän muokkaus
+		quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new NumberStringConverter()));
+		quantityColumn.setOnEditCommit(
+				new EventHandler<CellEditEvent<Ruokalista, Double>>() {
+					@Override
+					public void handle(CellEditEvent<Ruokalista, Double> table2) {
+						((Ruokalista) table2.getTableView().getItems().get(
+								table2.getTablePosition().getRow())
+								).setMaara(table2.getNewValue());
+					}
+				}
+		);
 
 		//Energy column
 		TableColumn<Ruokalista, Double> energyColumn = new TableColumn<>("Energia");
@@ -243,23 +274,15 @@ public class GUI extends Application{
 		hBox2.getChildren().addAll(poistaButton, kalorimaara);
 
 
-
 		table2 = new TableView<>();
+		table2.setEditable(true);
 		table2.setItems(getDaily());
 		table2.getColumns().addAll(nameColumn2, quantityColumn, energyColumn, calorieColumn2, proteinColumn2, carbColumn2, fatColumn2);
 
-		/*
-		 *
-		 *
-		 *
-		 *
-		table2.setEditable(true);
-		quantityColumn.setOnEditCommit(e -> maaraCol_OnEditCommit(e));
-		*
-		*
-		*
-		*
-		*/
+
+
+
+
 		Label kuluttaa = new Label("Paino muuttuu noin xxx viikossa");
 
 		VBox vBox2 = new VBox();
@@ -292,6 +315,8 @@ public class GUI extends Application{
 		RadioButton nainenRadio = new RadioButton("nainen");
 		nainenRadio.setToggleGroup(sukupuoliGroup);
 
+		miesRadio.setSelected(true);
+
 		// Aktiivisuustason valinta
 		ToggleGroup aktiviteettiGroup = new ToggleGroup();
 		RadioButton todellakevytRadio = new RadioButton("Todella kevyt (oleilua)");
@@ -302,6 +327,8 @@ public class GUI extends Application{
 		kohtalainenRadio.setToggleGroup(aktiviteettiGroup);
 		RadioButton raskasRadio = new RadioButton("Raskas (fyysisesti raskas työ)");
 		raskasRadio.setToggleGroup(aktiviteettiGroup);
+
+		todellakevytRadio.setSelected(true);
 
 		// Laske kulutus
 		Button btLaskeKulutus = new Button("Laske kulutus");
@@ -402,61 +429,6 @@ public class GUI extends Application{
 	}
 
 
-	//Päivän ateriat
-	public ObservableList<Ruokalista> getDaily() {
-		ruokalista.add(new Ruokalista("olut", 10, 10, 10, 10, 10, 10));
-		ruokalista.add(new Ruokalista("pähkinä", 100.5, 33.5, 33.5, 124, 44, 24));
-		ruokalista.add(new Ruokalista("oivariini", 278.3, 45.5, 45, 23, 1, 34));
-		
-		
-
-		return ruokalista;
-	}
-
-
-	//Ruoan lisäys päivän aterioihin
-	public void lisaaButtonClicked() {
-
-		//TODO GET SELECTED FROM table TO table2 <Ruoka> -> <Ruokalista>
-
-		ruokalista.addAll(table2.getSelectionModel().getSelectedItems());
-		table2.getSelectionModel().clearSelection();
-	}
-
-	//Ruoan poisto päivän aterioista
-	public void poistaButtonClicked() {
-		ruokalista.removeAll(table2.getSelectionModel().getSelectedItems());
-		table2.getSelectionModel().clearSelection();
-	}
-
-	//Ruoan määrän muokkauksen käsittely
-	public void maaraCol_OnEditCommit(Event e) {
-		TableColumn.CellEditEvent<Ruokalista, Double> cellEditEvent;
-		cellEditEvent = (TableColumn.CellEditEvent<Ruokalista, Double>) e;
-		Ruokalista ruokalista = cellEditEvent.getRowValue();
-		ruokalista.setMaara(cellEditEvent.getNewValue());
-	}
-
-	//Tallentaa ruokalistaan lisätyt ruoat
-	public void handleSave() {
-		saveFile(table2.getItems(), file);
-	}
-
-	public void saveFile(ObservableList<Ruokalista> ruokaa, File file) {
-		try {
-			BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
-
-			for (Ruokalista ruokalista : ruokaa) {
-				outWriter.write(ruokalista.toString());
-				outWriter.newLine();
-			}
-			outWriter.close();
-
-		} catch (IOException e) {
-
-		}
-	}
-
 	// Valitsee kaikki ruoat
 	public ObservableList<Ruoka> getData() {
 		try {
@@ -490,6 +462,69 @@ public class GUI extends Application{
 				Integer.parseInt(tfRaskas.getText()));
 
 		tfKulutus.setText(String.valueOf(kulutus));
+	}
+
+	//Päivän ateriat
+	public ObservableList<Ruokalista> getDaily() {
+
+		// Avaa ruoka-ainelistan
+		//loadFile(ruokalista, file);
+		
+		
+
+		//ruokalista.add(new Ruokalista("olut", 10.5, 10.2, 10.5, 10.2, 10.1, 10.9));
+		//ruokalista.add(new Ruokalista("pähkinä", 100.5, 33.5, 33.5, 124, 44, 24));
+		//ruokalista.add(new Ruokalista("oivariini", 278.3, 45.5, 45, 23, 1, 34));
+
+		return ruokalista;
+	}
+
+	//Ruoan lisäys päivän aterioihin
+	public void lisaaButtonClicked() {
+
+		//TODO GET SELECTED FROM table TO table2 <Ruoka> -> <Ruokalista>
+
+		ruokalista.addAll(table2.getSelectionModel().getSelectedItems());
+		table2.getSelectionModel().clearSelection();
+	}
+
+	//Ruoan poisto päivän aterioista
+	public void poistaButtonClicked() {
+		ruokalista.removeAll(table2.getSelectionModel().getSelectedItems());
+		table2.getSelectionModel().clearSelection();
+	}
+
+
+	// Lataa päivän ruoka-ainelistan jos sellainen on jo olemassa
+	public void loadFile(ObservableList<Ruokalista> ruokaa, File file) {
+		if (file != null) {
+			try {
+				desktop.open(file);
+			} catch (IOException ex) {
+
+			}
+		}
+	}
+
+	// Tallentaa ruokalistaan lisätyt ruoat
+	// Lisää tähän jos joskus halutaan tiedoston valinta mahdollisuus
+	public void handleSave() {
+		saveFile(table2.getItems(), file);
+	}
+
+	public void saveFile(ObservableList<Ruokalista> ruokaa, File file) {
+		try {
+			BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
+
+			for (Ruokalista ruokalista : ruokaa) {
+				outWriter.write(ruokalista.toString());
+				outWriter.newLine();
+			}
+			outWriter.close();
+
+		} catch (IOException e) {
+
+		}
 	}
 
 	public static void main(String[] args) {
