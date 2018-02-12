@@ -1,4 +1,5 @@
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
@@ -6,83 +7,86 @@ import javafx.beans.property.SimpleStringProperty;
  * @author Roope
  * @version 1.00 2018/1/25
  */
-public class Ruokalista {
+public class Ruokalista extends Ruoka{
 
-	private SimpleStringProperty nimi = new SimpleStringProperty(this, "nimi", "");
-	private SimpleDoubleProperty maara = new SimpleDoubleProperty(this, "maara", 0.0);
-	private SimpleDoubleProperty energia = new SimpleDoubleProperty(this, "energia", 0.0);
-	private SimpleDoubleProperty kalori = new SimpleDoubleProperty(this, "kalori", 0.0);
-	private SimpleDoubleProperty proteiini = new SimpleDoubleProperty(this, "proteiini", 0.0);
-	private SimpleDoubleProperty hiilihydraatti = new SimpleDoubleProperty(this, "hiilihydraatti", 0.0);
-	private SimpleDoubleProperty rasva = new SimpleDoubleProperty(this, "rasva", 0.0);
+	private String nimi;
+	private String maara;
+	private Double energia;
+	private Double kalori;
+	private Double proteiini;
+	private Double hiilihydraatti;
+	private Double rasva;
 
-	/*
-	Ruokalista(String nimi, double kalori, Double proteiini, double hiilihydraatti, double rasva, double maara, double energia) {
-		this.nimi = new SimpleStringProperty(nimi);
-		this.kalori = new SimpleDoubleProperty(kalori);
-		this.proteiini = new SimpleDoubleProperty(proteiini);
-		this.hiilihydraatti = new SimpleDoubleProperty(hiilihydraatti);
-		this.rasva = new SimpleDoubleProperty(rasva);
-		this.maara = new SimpleDoubleProperty(maara);
-		this.energia = new SimpleDoubleProperty(energia);
+
+	Ruokalista(String nimi, String maara, Double energia, Double kalori, Double proteiini, Double hiilihydraatti, Double rasva) {
+		this.nimi = new String(nimi);
+		this.kalori = new Double(kalori);
+		this.proteiini = new Double(proteiini);
+		this.hiilihydraatti = new Double(hiilihydraatti);
+		this.rasva = new Double(rasva);
+		this.maara = new String(maara);
+		this.energia = new Double(energia);
 	}
-	*/
+
 
 	public String getNimi() {
-		return nimi.get();
+		return nimi;
 	}
 
-	public void setNimi(String enimi) {
-		this.nimi.set(enimi);
+	public void setNimi(String nimi) {
+		this.nimi = nimi;
 	}
 
-	public Double getKalori() {
-		return kalori.get();
+	public double getKalori() {
+		return kalori;
 	}
 
-	public void setKalori(Double kalori) {
-		this.kalori.set(kalori);
+	public void setKalori(double kalori) {
+		this.kalori = kalori;
 	}
 
 	public double getProteiini() {
-		return proteiini.get();
+		return proteiini;
 	}
 
-	public void setProteiini(Double proteiini) {
-		this.proteiini.set(proteiini);
+	public void setProteiini(double proteiini) {
+		this.proteiini = proteiini;
 	}
 
 	public double getHiilihydraatti() {
-		return hiilihydraatti.get();
+		return hiilihydraatti;
 	}
 
-	public void setHiilihydraatti(Double hiilihydraatti) {
-		this.hiilihydraatti.set(hiilihydraatti);
+	public void setHiilihydraatti(double hiilihydraatti) {
+		this.hiilihydraatti = hiilihydraatti;
 	}
 
 	public double getRasva() {
-		return rasva.get();
+		return rasva;
 	}
 
-	public void setRasva(Double rasva) {
-		this.rasva.set(rasva);
+	public void setRasva(double rasva) {
+		this.rasva = rasva;
 	}
 
-
-	public double getMaara() {
-		return maara.get();
+	public String getMaara() {
+		return maara;
 	}
 
-	public void setMaara(Double maara) {
-		this.maara.set(maara);
+	public void setMaara(String maara) {
+		this.maara = maara;
 	}
 
 	public double getEnergia() {
-		return energia.get();
+		return energia;
 	}
 
-	public void setEnergia(Double energia) {
-		this.energia.set(energia);;
+	public void setEnergia(double energia) {
+		this.energia = energia;
+	}
+	
+	public String toCSV() {
+		return getNimi() + "," + getMaara() + "," + getEnergia() + "," + getKalori() + "," + getProteiini() + "," + getHiilihydraatti() + "," + getRasva();
 	}
 
 }
