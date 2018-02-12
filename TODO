@@ -2,12 +2,6 @@ TODO
 
 Päivän ateriat:
 	-määrä, jonka perusteella laskee energian
-	-määrän tulee olla muokattavissa
-	-energia, joka saadaan määrä * proteiini * hiilari * rasva
-	-koko päivän kalorisaanti
+	-koko päivän kalorisaanti, joka saadaan määrä * proteiini * hiilari * rasva
 	-paljonko +/-
 	-makrot
-	-tiedosto joka lataa päivän ateriat
-		-tallennus toimii
-		-lataus ei
-	-"poista listasta" vaatii parserin Ruoka -> Ruokalista, mutta "toimii"
