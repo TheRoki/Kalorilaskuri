@@ -97,6 +97,7 @@ public class GUI extends Application{
 
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		window = primaryStage;
@@ -223,19 +224,29 @@ public class GUI extends Application{
 		TableColumn quantityColumn = new TableColumn("Määrä");
 		quantityColumn.setMinWidth(200);
 		quantityColumn.setCellValueFactory(
-				new PropertyValueFactory<Ruokalista, Double>("maara"));
+				new PropertyValueFactory<Ruokalista, Integer>("maara"));
+
+
+
+		/*
+		@SuppressWarnings("rawtypes")
+		TableColumn quantityColumn = new TableColumn("Määrä");
+		quantityColumn.setMinWidth(200);
+		quantityColumn.setCellValueFactory(
+				new PropertyValueFactory<Ruokalista, Integer>("maara"));
 		// Määrän muokkaus
 		quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new NumberStringConverter()));
 		quantityColumn.setOnEditCommit(
-				new EventHandler<CellEditEvent<Ruokalista, Double>>() {
+				new EventHandler<CellEditEvent<Ruokalista, Integer>>() {
 					@Override
-					public void handle(CellEditEvent<Ruokalista, Double> table2) {
-						((Ruokalista) table2.getTableView().getItems().get(
-								table2.getTablePosition().getRow())
-								).setMaara(table2.getNewValue());
+					public void handle(CellEditEvent<Ruokalista, Integer> table2) {
+						System.out.println((Ruokalista) table2.getTableView().getItems().get(table2.getTablePosition()));
+
+						Integer i = ((Integer) table2.getTableView().getItems().get(table2.getTablePosition())).setMaara(table2.getNewValue());
 					}
 				}
 		);
+	*/
 
 		//Energy column
 		TableColumn<Ruokalista, Double> energyColumn = new TableColumn<>("Energia");
@@ -266,12 +277,15 @@ public class GUI extends Application{
 		Button poistaButton = new Button("Poista listasta");
 		poistaButton.setOnAction(e -> poistaButtonClicked());
 
-		Label kalorimaara = new Label("kaloreita xxxx kcal");
+		Label kalorimaara = new Label("kaloreita " + laskeEnergia() + " kcal");
+		Label proteiinimaara = new Label( "P: " + laskeProteiini() );
+		Label hiilarimaara = new Label( "H: " + laskeHiilihydraatti() );
+		Label rasvamaara = new Label ( "R: " + laskeRasva() );
 
 		HBox hBox2 = new HBox();
-		hBox2.setPadding(new Insets(1, 1, 1, 1));
-		hBox2.setSpacing(1);
-		hBox2.getChildren().addAll(poistaButton, kalorimaara);
+		hBox2.setPadding(new Insets(10, 10, 10, 10));
+		hBox2.setSpacing(200);
+		hBox2.getChildren().addAll(poistaButton, kalorimaara, proteiinimaara, hiilarimaara, rasvamaara);
 
 
 		table2 = new TableView<>();
@@ -280,10 +294,24 @@ public class GUI extends Application{
 		table2.getColumns().addAll(nameColumn2, quantityColumn, energyColumn, calorieColumn2, proteinColumn2, carbColumn2, fatColumn2);
 
 
+		quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		quantityColumn.setOnEditCommit(
+		    new EventHandler<CellEditEvent<Ruokalista, String>>() {
+		        @Override
+		        public void handle(CellEditEvent<Ruokalista, String> t) {
+		            ((Ruokalista) t.getTableView().getItems().get(
+		                t.getTablePosition().getRow())
+		                ).setMaara(t.getNewValue());
+		        }
+		    }
+		);
 
 
+		//quantityColumn.setOnEditCommit(e -> quantityColumn_OnEditCommit(e));
+		//quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new NumberStringConverter()));
 
-		Label kuluttaa = new Label("Paino muuttuu noin xxx viikossa");
+
+		Label kuluttaa = new Label("Paino muuttuu noin " + laskeErotus() + " viikossa");
 
 		VBox vBox2 = new VBox();
 		vBox2.getChildren().addAll(table2, hBox2, kuluttaa);
@@ -428,7 +456,6 @@ public class GUI extends Application{
 		}
 	}
 
-
 	// Valitsee kaikki ruoat
 	public ObservableList<Ruoka> getData() {
 		try {
@@ -469,22 +496,35 @@ public class GUI extends Application{
 
 		// Avaa ruoka-ainelistan
 		//loadFile(ruokalista, file);
-		
-		
+		String CsvFile = "C:\\Users\\Roope\\workspace\\Parityo\\ruokalista";
+		String FieldDelimeter = ",";
 
-		//ruokalista.add(new Ruokalista("olut", 10.5, 10.2, 10.5, 10.2, 10.1, 10.9));
-		//ruokalista.add(new Ruokalista("pähkinä", 100.5, 33.5, 33.5, 124, 44, 24));
-		//ruokalista.add(new Ruokalista("oivariini", 278.3, 45.5, 45, 23, 1, 34));
+		BufferedReader br;
 
+		try {
+			br = new BufferedReader(new FileReader(CsvFile));
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] fields = line.split(FieldDelimeter);
+
+				Ruokalista record = new Ruokalista(fields[0], fields[1], Double.parseDouble(fields[2]), Double.parseDouble(fields[3]), Double.parseDouble(fields[4]), Double.parseDouble(fields[5]), Double.parseDouble(fields[6]));
+				ruokalista.add(record);
+			}
+
+		} catch (FileNotFoundException ex) {
+
+		} catch (IOException ex) {
+
+		}
 		return ruokalista;
 	}
 
 	//Ruoan lisäys päivän aterioihin
 	public void lisaaButtonClicked() {
-
-		//TODO GET SELECTED FROM table TO table2 <Ruoka> -> <Ruokalista>
-
-		ruokalista.addAll(table2.getSelectionModel().getSelectedItems());
+		Ruoka valittu = table.getSelectionModel().getSelectedItem();
+		Ruokalista val = new Ruokalista(valittu.getNimi(), "100", 31.5, valittu.getKalori(), valittu.getProteiini(), valittu.getHiilihydraatti(), valittu.getRasva());
+		ruokalista.addAll(val);
 		table2.getSelectionModel().clearSelection();
 	}
 
@@ -493,17 +533,55 @@ public class GUI extends Application{
 		ruokalista.removeAll(table2.getSelectionModel().getSelectedItems());
 		table2.getSelectionModel().clearSelection();
 	}
-
-
-	// Lataa päivän ruoka-ainelistan jos sellainen on jo olemassa
-	public void loadFile(ObservableList<Ruokalista> ruokaa, File file) {
-		if (file != null) {
-			try {
-				desktop.open(file);
-			} catch (IOException ex) {
-
-			}
-		}
+	
+	public double laskeEnergia() {
+		// 1 g proteiinia = 4 kcal
+		// 1 g hiilihydraattia = 4 kcal
+		// 1 g rasvaa = 9 kcal
+		double energia = 0;
+		double proteiini = laskeProteiini();
+		double hiilari = laskeHiilihydraatti();
+		double rasva = laskeRasva();
+		
+		energia = proteiini * 4;
+		
+		energia += hiilari * 4;
+		
+		energia += rasva * 9;
+		
+		return energia;
+	}
+	
+	public double laskeProteiini() {
+		
+		double proteiini = 0.0;
+		
+		//for (Ruokalista prode : table2.getItems()) {
+			//System.out.println(prode.getProteiini());
+			//proteiini = proteiini + Double.parseDouble(prode.getProteiini());
+		//}
+		
+		return proteiini;
+	}
+	
+	public double laskeHiilihydraatti() {
+		
+		double hiilihydraatti = 0;
+		
+		return hiilihydraatti;
+	}
+	
+	public double laskeRasva() {
+		
+		double rasva = 0;
+		
+		return rasva;
+	}
+	
+	public Integer laskeErotus() {
+		int erotus = 0;
+		
+		return erotus;
 	}
 
 	// Tallentaa ruokalistaan lisätyt ruoat
@@ -516,10 +594,11 @@ public class GUI extends Application{
 		try {
 			BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
 
-			for (Ruokalista ruokalista : ruokaa) {
-				outWriter.write(ruokalista.toString());
+			for (Ruokalista ruokaolio : ruokaa) {
+				outWriter.write(ruokaolio.toCSV());
 				outWriter.newLine();
 			}
+			
 			outWriter.close();
 
 		} catch (IOException e) {
