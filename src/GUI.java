@@ -4,7 +4,6 @@
  * @author Roope Ilvonen
  * @version 1.00 2017/4/25
  */
-
 import java.awt.Desktop;
 import javafx.beans.property.SimpleStringProperty;
 import java.io.BufferedReader;
@@ -22,27 +21,15 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.function.Predicate;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
@@ -57,10 +44,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.converter.NumberStringConverter;
 
 /**
  *
@@ -70,15 +54,13 @@ import javafx.util.converter.NumberStringConverter;
  */
 public class GUI extends Application{
 	Connection conn;
-	private Scanner x;
 
 	Stage window;
 	TableView<Ruoka> table;
 	TableView<Ruokalista> table2;
 	final ObservableList<Ruoka> ruoat = FXCollections.observableArrayList();
-	ObservableList<Ruokalista> ruokalista = FXCollections.observableArrayList();
+	final ObservableList<Ruokalista> ruokalista = FXCollections.observableArrayList();
 	MenuBar fileMenu;
-	private Desktop desktop = Desktop.getDesktop();
 
 	String CsvFile = "C:\\Users\\Roope\\workspace\\Parityo\\ruokalista";
 	File file = new File (CsvFile);
@@ -94,7 +76,13 @@ public class GUI extends Application{
 	TextField tfKohtalainen = new TextField();
 	TextField tfKuormittava = new TextField();
 	TextField tfRaskas = new TextField();
-	final TextField tfKulutus = new TextField();
+	TextField tfKulutus = new TextField();
+
+	Label kalorimaar = new Label();
+	Label proteiinimaara = new Label();
+	Label hiilarimaara = new Label();
+	Label rasvamaara = new Label();
+	Label kuluttaa = new Label();
 
 
 
@@ -221,8 +209,7 @@ public class GUI extends Application{
 		TableColumn quantityColumn = new TableColumn("Määrä");
 		quantityColumn.setMinWidth(200);
 		quantityColumn.setCellValueFactory(
-				new PropertyValueFactory<Ruokalista, Integer>("maara"));
-
+				new PropertyValueFactory<Ruokalista, String>("maara"));
 
 		//Energy column
 		TableColumn<Ruokalista, Double> energyColumn = new TableColumn<>("Energia");
@@ -249,41 +236,75 @@ public class GUI extends Application{
 		fatColumn2.setMinWidth(200);
 		fatColumn2.setCellValueFactory(new PropertyValueFactory<>("rasva"));
 
-		//Button
-		Button poistaButton = new Button("Poista listasta");
-		poistaButton.setOnAction(e -> poistaButtonClicked());
 
-		Label kalorimaara = new Label("kaloreita " + laskeKokoEnergia() + " kcal");
-		Label proteiinimaara = new Label( "P: " + laskeKokoProteiini() );
-		Label hiilarimaara = new Label( "H: " + laskeKokoHiilihydraatti() );
-		Label rasvamaara = new Label ( "R: " + laskeKokoRasva() );
-
-		HBox hBox2 = new HBox();
-		hBox2.setPadding(new Insets(10, 10, 10, 10));
-		hBox2.setSpacing(200);
-		hBox2.getChildren().addAll(poistaButton, kalorimaara, proteiinimaara, hiilarimaara, rasvamaara);
 
 
 		table2 = new TableView<>();
-		table2.setEditable(true);
 		table2.setItems(getDaily());
 		table2.getColumns().addAll(nameColumn2, quantityColumn, energyColumn, calorieColumn2, proteinColumn2, carbColumn2, fatColumn2);
-
+		table2.setEditable(true);
 
 		quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		quantityColumn.setOnEditCommit(
 		    new EventHandler<CellEditEvent<Ruokalista, String>>() {
 		        @Override
 		        public void handle(CellEditEvent<Ruokalista, String> t) {
-		            ((Ruokalista) t.getTableView().getItems().get(
-		                t.getTablePosition().getRow())
-		                ).setMaara(t.getNewValue());
+		        	Ruokalista ruu =  (Ruokalista) t.getTableView().getItems().get(t.getTablePosition().getRow());
+
+		        	double vanhamaara = Double.parseDouble(ruu.getMaara());
+
+		        	((Ruokalista) t.getTableView().getItems().get(t.getTablePosition().getRow())).setMaara(t.getNewValue());
+
+
+
+
+
+		            double maara = Double.parseDouble(ruu.getMaara());
+
+		            double energia = ruu.getKalori();
+
+		            double proteiini = ruu.getProteiini();
+
+		            double hiilari = ruu.getHiilihydraatti();
+
+		            double rasva = ruu.getRasva();
+
+		            // ota olion energia ja uusi määrä
+		            ruu.setEnergia(maaraEnergia(energia , maara));
+		            //ota olion proteiini ja uusi määrä
+		            ruu.setProteiini(maaraProteiini(proteiini,vanhamaara, maara));
+		            //ota olion hiilihydraatti ja uusi määrä
+		            ruu.setHiilihydraatti(maaraHiilihydraatti(hiilari, vanhamaara, maara));
+		            //ota olion rasva ja uusi määrä
+		            ruu.setRasva(maaraRasva(rasva, vanhamaara, maara));
+
+		            table2.refresh();
+
+		    		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
+		    		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
+		    		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
+		    		rasvamaara.setText( "R: " + laskeKokoRasva() );
+		    		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " viikossa");
 		        }
 		    }
 		);
 
 
-		Label kuluttaa = new Label("Paino muuttuu noin " + laskeErotus() + " viikossa");
+		//Button
+		Button poistaButton = new Button("Poista listasta");
+		poistaButton.setOnAction(e -> poistaButtonClicked());
+
+		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
+		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
+		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
+		rasvamaara.setText( "R: " + laskeKokoRasva() );
+
+		HBox hBox2 = new HBox();
+		hBox2.setPadding(new Insets(10, 10, 10, 10));
+		hBox2.setSpacing(200);
+		hBox2.getChildren().addAll(poistaButton, kalorimaar, proteiinimaara, hiilarimaara, rasvamaara);
+
+		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " grammaa viikossa");
 
 		VBox vBox2 = new VBox();
 		vBox2.getChildren().addAll(table2, hBox2, kuluttaa);
@@ -353,6 +374,7 @@ public class GUI extends Application{
 		tfRaskas.setText("0");
 		paneeli.add(btLaskeKulutus, 2, 16);
 		paneeli.add(tfKulutus, 2, 17);
+
 
 
 		// Sijoittelu
@@ -461,18 +483,16 @@ public class GUI extends Application{
 				Integer.parseInt(tfRaskas.getText()));
 
 		tfKulutus.setText(String.valueOf(kulutus));
+		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " grammaa viikossa");
 	}
 
 	//Päivän ateriat
 	public ObservableList<Ruokalista> getDaily() {
-
 		String FieldDelimeter = ",";
-
 		BufferedReader br;
 
 		try {
 			br = new BufferedReader(new FileReader(CsvFile));
-
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] fields = line.split(FieldDelimeter);
@@ -480,12 +500,12 @@ public class GUI extends Application{
 				Ruokalista record = new Ruokalista(fields[0], fields[1], Double.parseDouble(fields[2]), Double.parseDouble(fields[3]), Double.parseDouble(fields[4]), Double.parseDouble(fields[5]), Double.parseDouble(fields[6]));
 				ruokalista.add(record);
 			}
-
 		} catch (FileNotFoundException ex) {
 
 		} catch (IOException ex) {
 
 		}
+
 		return ruokalista;
 	}
 
@@ -500,106 +520,139 @@ public class GUI extends Application{
 				m,
 				maaraEnergia(valittu.getKalori(), maara),
 				valittu.getKalori(),
-				maaraProteiini(valittu.getProteiini(), maara),
-				maaraHiilihydraatti(valittu.getHiilihydraatti(), maara),
-				maaraRasva(valittu.getRasva(), maara));
+				maaraProteiini(valittu.getProteiini(),maara, maara),
+				maaraHiilihydraatti(valittu.getHiilihydraatti(), maara, maara),
+				maaraRasva(valittu.getRasva(), maara, maara));
 
 		ruokalista.addAll(val);
 		table2.getSelectionModel().clearSelection();
+
+		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
+		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
+		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
+		rasvamaara.setText( "R: " + laskeKokoRasva() );
+		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " viikossa");
 	}
 
 	//Ruoan poisto päivän aterioista
 	public void poistaButtonClicked() {
 		ruokalista.removeAll(table2.getSelectionModel().getSelectedItems());
 		table2.getSelectionModel().clearSelection();
+
+		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
+		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
+		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
+		rasvamaara.setText( "R: " + laskeKokoRasva() );
+		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " viikossa");
+
 	}
 
 	// Laskee ruoan kalorimäärän annetun määrän perusteella
 	public double maaraEnergia(double energia, double maara) {
 		// jos 100 g on 50 kcal, niin kuinka monta on kcal on 80g? 140?
+		energia = (energia / 100) * maara;
 
-		// TODO KAAVA
+		double round = Math.round(energia * 100.0)/100.0;
 
-		// joka ei siis ole tämä
-		energia = energia * maara;
-
-		return energia;
+		return round;
 	}
 
 	// Laskee ruoan proteiinimäärän annetun määrän perusteella
-	public double maaraProteiini(double proteiini, double maara) {
+	public double maaraProteiini(double proteiini, double vanhamaara, double maara) {
 		// jos 100 g on 50 proteiinia, niin kuinka paljon proteiinia on 80g? 140?
 
-		// TODO KAAVA
-		proteiini = proteiini * maara;
+		proteiini = (proteiini * maara) / vanhamaara;
 
-		return proteiini;
+		double round = Math.round(proteiini * 100.0)/100.0;
+
+		return round;
 	}
 
 	// Laskee ruoan hiilihydraattimäärän annetun määrän perusteella
-	public double maaraHiilihydraatti(double hiilari, double maara) {
+	public double maaraHiilihydraatti(double hiilari, double vanhamaara, double maara) {
 		// jos 100 g on 50 hiilaria, niin kuinka paljon hiilaria on 80g? 140?
+		hiilari = (hiilari * maara) / vanhamaara;
 
-		// TODO KAAVA
-		hiilari = hiilari * maara;
+		double round = Math.round(hiilari * 100.0)/100.0;
 
-		return hiilari;
+		return round;
 	}
 
 	// Laskee ruoan rasvamäärän annetun määrän perusteella
-	public double maaraRasva(double rasva, double maara) {
+	public double maaraRasva(double rasva, double vanhamaara, double maara) {
 		// jos 100 g on 50 rasvaa, niin kuinka paljon hiilaria on 80g? 140?
+		rasva = (rasva * maara) / vanhamaara;
 
-		// TODO KAAVA
-		rasva = rasva * maara;
+		double round = Math.round(rasva * 100.0)/100.0;
 
-		return rasva;
+		return round;
 	}
 
 	// Laskee kaikkien päivän ruokien yhteisenergian
 	public double laskeKokoEnergia() {
-
 		double energia = 0;
 
-		return energia;
+		for (Ruokalista energiaaa : table2.getItems()) {
+			energia = energia + energiaaa.getEnergia();
+		}
+		double round = Math.round(energia * 100.0)/100.0;
+
+		return round;
 	}
 
 	// Lakee kaikkien päivän ruokien proteiinimäärän
 	public double laskeKokoProteiini() {
 		double proteiini = 0;
 
-		//TODO
 		// laske proteiini yhteensä
-		//for (Ruokalista prode : table2.getItems()) {
-		//	proteiini = proteiini + prode.getProteiini();
-		//}
+		for (Ruokalista prode : table2.getItems()) {
+			proteiini = proteiini + prode.getProteiini();
+		}
 
-		return proteiini;
+
+		double round = Math.round(proteiini * 100.0)/100.0;
+
+		return round;
 	}
 
 	// Laskee kaikkien päivän ruokien hiilihydraattimäärän
 	public double laskeKokoHiilihydraatti() {
 		double hiilihydraatti = 0;
 
-		//TODO
+		// laske hiilihydraatti yhteensä
+		for (Ruokalista hiilari : table2.getItems()) {
+			hiilihydraatti = hiilihydraatti + hiilari.getHiilihydraatti();
+		}
 
-		return hiilihydraatti;
+		double round = Math.round(hiilihydraatti * 100.0)/100.0;
+
+		return round;
 	}
 
 	// Laskee kaikkien päivän ruokien rasvamäärän
 	public double laskeKokoRasva() {
 		double rasva = 0;
 
-		//TODO
+		// laske rasva yhteensä
+		for (Ruokalista ras : table2.getItems()) {
+			rasva = rasva + ras.getRasva();
+		}
+		double round = Math.round(rasva * 100.0)/100.0;
 
-		return rasva;
+		return round;
 	}
 
 	// Laskee kulutuksen ja päivän kalorisaannin ja ilmoittaa paljonko henkilö on plussilla/miinuksilla
-	public Integer laskeErotus() {
-		int erotus = 0;
+	public Double laskeErotus() {
+		double erotus = 0;
+		double kulutus = 0;
 
-		//TODO
+		if (! tfKulutus.getText().trim().isEmpty()) {
+			kulutus = Double.parseDouble(tfKulutus.getText());
+		}
+
+		double energia = laskeKokoEnergia();
+		erotus = energia - kulutus;
 
 		return erotus;
 	}
