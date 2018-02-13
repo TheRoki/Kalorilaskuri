@@ -10,12 +10,14 @@ import javafx.beans.property.SimpleStringProperty;
 public class Ruokalista extends Ruoka{
 
 	private String maara;
-	private Double energia;
+	private double energia;
 
-	Ruokalista(String nimi, String maara, Double energia, Double kalori, Double proteiini, Double hiilihydraatti, Double rasva) {
+	Ruokalista(String nimi, String maara, double energia, double kalori, double proteiini, double hiilihydraatti, double rasva) {
 		super (nimi, kalori, proteiini, hiilihydraatti, rasva);
-		this.maara = new String(maara);
-		this.energia = new Double(energia);
+		
+		this.maara = maara;
+		this.energia = energia;
+		
 	}
 
 	public String getMaara() {
