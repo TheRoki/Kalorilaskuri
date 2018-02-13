@@ -1,11 +1,10 @@
+
 /**
  * GUI-luokka, joka toteuttaa graafisen käyttöliittymän ohjelman suoritukselle
  *
  * @author Roope Ilvonen
  * @version 1.00 2017/4/25
  */
-import java.awt.Desktop;
-import javafx.beans.property.SimpleStringProperty;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,12 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import javafx.application.Application;
@@ -52,7 +46,7 @@ import javafx.stage.Stage;
  * @version 1.00 2017/4/25
  *
  */
-public class GUI extends Application{
+public class GUI extends Application {
 	Connection conn;
 
 	Stage window;
@@ -63,7 +57,7 @@ public class GUI extends Application{
 	MenuBar fileMenu;
 
 	String CsvFile = "C:\\Users\\Roope\\workspace\\Parityo\\ruokalista";
-	File file = new File (CsvFile);
+	File file = new File(CsvFile);
 
 	TextField nameInput, calorieInput, proteinInput, carbInput, fatInput, filterField, kalorimaara;
 
@@ -84,8 +78,9 @@ public class GUI extends Application{
 	Label rasvamaara = new Label();
 	Label kuluttaa = new Label();
 
-
-
+	/**
+	 * Start
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -105,53 +100,53 @@ public class GUI extends Application{
 		 *
 		 */
 
-		//Name column
+		// Name column
 		TableColumn<Ruoka, String> nameColumn = new TableColumn<>("Ravintoainelista");
 		nameColumn.setMinWidth(200);
 		nameColumn.setCellValueFactory(new PropertyValueFactory<>("nimi"));
 
-		//Calorie column
+		// Calorie column
 		TableColumn<Ruoka, Double> calorieColumn = new TableColumn<>("Kcal/100g");
 		calorieColumn.setMinWidth(150);
 		calorieColumn.setCellValueFactory(new PropertyValueFactory<>("kalori"));
 
-		//Protein column
+		// Protein column
 		TableColumn<Ruoka, Double> proteinColumn = new TableColumn<>("Proteiini");
 		proteinColumn.setMinWidth(150);
 		proteinColumn.setCellValueFactory(new PropertyValueFactory<>("proteiini"));
 
-		//Carb column
+		// Carb column
 		TableColumn<Ruoka, Double> carbColumn = new TableColumn<>("Hiilihydraatti");
 		carbColumn.setMinWidth(150);
 		carbColumn.setCellValueFactory(new PropertyValueFactory<>("hiilihydraatti"));
 
-		//Fat column
+		// Fat column
 		TableColumn<Ruoka, Double> fatColumn = new TableColumn<>("Rasva");
 		fatColumn.setMinWidth(150);
 		fatColumn.setCellValueFactory(new PropertyValueFactory<>("rasva"));
 
-		//Name input
+		// Name input
 		nameInput = new TextField();
 		nameInput.setPromptText("Nimi");
 		nameInput.setMinWidth(100);
 
-		//Calorie input
+		// Calorie input
 		calorieInput = new TextField();
 		calorieInput.setPromptText("Kalorit");
 
-		//Protein input
+		// Protein input
 		proteinInput = new TextField();
 		proteinInput.setPromptText("Proteiini");
 
-		//Carb input
+		// Carb input
 		carbInput = new TextField();
 		carbInput.setPromptText("Hiilihydraatti");
 
-		//Fat input
+		// Fat input
 		fatInput = new TextField();
 		fatInput.setPromptText("Rasva");
 
-		//Lisää nappi
+		// Lisää nappi
 		Button addButton = new Button("Lisää");
 		addButton.setOnAction(e -> addButtonClicked());
 
@@ -188,7 +183,6 @@ public class GUI extends Application{
 		VBox vBox = new VBox();
 		vBox.getChildren().addAll(hboxi, hBox, table, lisaaButton);
 
-
 		/*
 		 *
 		 *
@@ -200,104 +194,93 @@ public class GUI extends Application{
 		 *
 		 *
 		 */
-		//Name column
+		// Name column
 		TableColumn<Ruokalista, String> nameColumn2 = new TableColumn<>("Ruoka-aine");
 		nameColumn2.setMinWidth(200);
 		nameColumn2.setCellValueFactory(new PropertyValueFactory<>("nimi"));
 
-
 		TableColumn quantityColumn = new TableColumn("Määrä");
 		quantityColumn.setMinWidth(200);
-		quantityColumn.setCellValueFactory(
-				new PropertyValueFactory<Ruokalista, String>("maara"));
+		quantityColumn.setCellValueFactory(new PropertyValueFactory<Ruokalista, String>("maara"));
 
-		//Energy column
+		// Energy column
 		TableColumn<Ruokalista, Double> energyColumn = new TableColumn<>("Energia");
 		energyColumn.setMinWidth(200);
 		energyColumn.setCellValueFactory(new PropertyValueFactory<>("energia"));
 
-		//Calorie column
+		// Calorie column
 		TableColumn<Ruokalista, Double> calorieColumn2 = new TableColumn<>("Kcal/100g");
 		calorieColumn2.setMinWidth(200);
 		calorieColumn2.setCellValueFactory(new PropertyValueFactory<>("kalori"));
 
-		//Protein column
+		// Protein column
 		TableColumn<Ruokalista, Double> proteinColumn2 = new TableColumn<>("Proteiini");
 		proteinColumn2.setMinWidth(200);
 		proteinColumn2.setCellValueFactory(new PropertyValueFactory<>("proteiini"));
 
-		//Carb column
+		// Carb column
 		TableColumn<Ruokalista, Double> carbColumn2 = new TableColumn<>("Hiilihydraatti");
 		carbColumn2.setMinWidth(200);
 		carbColumn2.setCellValueFactory(new PropertyValueFactory<>("hiilihydraatti"));
 
-		//Fat column
+		// Fat column
 		TableColumn<Ruokalista, Double> fatColumn2 = new TableColumn<>("Rasva");
 		fatColumn2.setMinWidth(200);
 		fatColumn2.setCellValueFactory(new PropertyValueFactory<>("rasva"));
 
-
-
-
 		table2 = new TableView<>();
 		table2.setItems(getDaily());
-		table2.getColumns().addAll(nameColumn2, quantityColumn, energyColumn, calorieColumn2, proteinColumn2, carbColumn2, fatColumn2);
+		table2.getColumns().addAll(nameColumn2, quantityColumn, energyColumn, calorieColumn2, proteinColumn2,
+				carbColumn2, fatColumn2);
 		table2.setEditable(true);
 
 		quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		quantityColumn.setOnEditCommit(
-		    new EventHandler<CellEditEvent<Ruokalista, String>>() {
-		        @Override
-		        public void handle(CellEditEvent<Ruokalista, String> t) {
-		        	Ruokalista ruu =  (Ruokalista) t.getTableView().getItems().get(t.getTablePosition().getRow());
+		quantityColumn.setOnEditCommit(new EventHandler<CellEditEvent<Ruokalista, String>>() {
+			@Override
+			public void handle(CellEditEvent<Ruokalista, String> t) {
+				Ruokalista ruu = (Ruokalista) t.getTableView().getItems().get(t.getTablePosition().getRow());
 
-		        	double vanhamaara = Double.parseDouble(ruu.getMaara());
+				double vanhamaara = Double.parseDouble(ruu.getMaara());
 
-		        	((Ruokalista) t.getTableView().getItems().get(t.getTablePosition().getRow())).setMaara(t.getNewValue());
+				((Ruokalista) t.getTableView().getItems().get(t.getTablePosition().getRow())).setMaara(t.getNewValue());
 
+				double maara = Double.parseDouble(ruu.getMaara());
 
+				double energia = ruu.getKalori();
 
+				double proteiini = ruu.getProteiini();
 
+				double hiilari = ruu.getHiilihydraatti();
 
-		            double maara = Double.parseDouble(ruu.getMaara());
+				double rasva = ruu.getRasva();
 
-		            double energia = ruu.getKalori();
+				// ota olion energia ja uusi määrä
+				ruu.setEnergia(maaraEnergia(energia, maara));
+				// ota olion proteiini ja uusi määrä
+				ruu.setProteiini(maaraProteiini(proteiini, vanhamaara, maara));
+				// ota olion hiilihydraatti ja uusi määrä
+				ruu.setHiilihydraatti(maaraHiilihydraatti(hiilari, vanhamaara, maara));
+				// ota olion rasva ja uusi määrä
+				ruu.setRasva(maaraRasva(rasva, vanhamaara, maara));
 
-		            double proteiini = ruu.getProteiini();
+				table2.refresh();
 
-		            double hiilari = ruu.getHiilihydraatti();
+				kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
+				proteiinimaara.setText("P: " + laskeKokoProteiini());
+				hiilarimaara.setText("H: " + laskeKokoHiilihydraatti());
+				rasvamaara.setText("R: " + laskeKokoRasva());
+				kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " viikossa");
+			}
+		});
 
-		            double rasva = ruu.getRasva();
-
-		            // ota olion energia ja uusi määrä
-		            ruu.setEnergia(maaraEnergia(energia , maara));
-		            //ota olion proteiini ja uusi määrä
-		            ruu.setProteiini(maaraProteiini(proteiini,vanhamaara, maara));
-		            //ota olion hiilihydraatti ja uusi määrä
-		            ruu.setHiilihydraatti(maaraHiilihydraatti(hiilari, vanhamaara, maara));
-		            //ota olion rasva ja uusi määrä
-		            ruu.setRasva(maaraRasva(rasva, vanhamaara, maara));
-
-		            table2.refresh();
-
-		    		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
-		    		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
-		    		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
-		    		rasvamaara.setText( "R: " + laskeKokoRasva() );
-		    		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " viikossa");
-		        }
-		    }
-		);
-
-
-		//Button
+		// Button
 		Button poistaButton = new Button("Poista listasta");
 		poistaButton.setOnAction(e -> poistaButtonClicked());
 
 		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
-		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
-		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
-		rasvamaara.setText( "R: " + laskeKokoRasva() );
+		proteiinimaara.setText("P: " + laskeKokoProteiini());
+		hiilarimaara.setText("H: " + laskeKokoHiilihydraatti());
+		rasvamaara.setText("R: " + laskeKokoRasva());
 
 		HBox hBox2 = new HBox();
 		hBox2.setPadding(new Insets(10, 10, 10, 10));
@@ -309,25 +292,24 @@ public class GUI extends Application{
 		VBox vBox2 = new VBox();
 		vBox2.getChildren().addAll(table2, hBox2, kuluttaa);
 
-
-		//Luodaan kysymyskentät
+		// Luodaan kysymyskentät
 		GridPane paneeli = new GridPane();
 
-		paneeli.add(new Label("Sukupuoli"),0,0);
+		paneeli.add(new Label("Sukupuoli"), 0, 0);
 		paneeli.add(new Label("Ikä: "), 0, 3);
 		paneeli.add(new Label("v"), 3, 3);
 		paneeli.add(new Label("Pituus: "), 0, 4);
 		paneeli.add(new Label("cm"), 3, 4);
 		paneeli.add(new Label("Paino: "), 0, 5);
 		paneeli.add(new Label("kg"), 3, 5);
-		paneeli.add(new Label ("Aktiivisuustaso"), 0, 6);
-		paneeli.add(new Label ("Päivän liikunta (min.)"), 0, 11);
-		paneeli.add(new Label ("Kevyttä liikuntaa (kävely)"), 0, 12);
-		paneeli.add(new Label ("Kohtalaista liikuntaa (reipas kävely)"), 0, 13);
-		paneeli.add(new Label ("Kuormittavaa liikuntaa (kuntosali)"), 0, 14);
-		paneeli.add(new Label ("Raskasta liikuntaa (juoksulenkki)"), 0, 15);
-		paneeli.add(new Label ("Kulutuksesi on:"), 0, 17);
-		paneeli.add(new Label ("kcal"), 3, 17);
+		paneeli.add(new Label("Aktiivisuustaso"), 0, 6);
+		paneeli.add(new Label("Päivän liikunta (min.)"), 0, 11);
+		paneeli.add(new Label("Kevyttä liikuntaa (kävely)"), 0, 12);
+		paneeli.add(new Label("Kohtalaista liikuntaa (reipas kävely)"), 0, 13);
+		paneeli.add(new Label("Kuormittavaa liikuntaa (kuntosali)"), 0, 14);
+		paneeli.add(new Label("Raskasta liikuntaa (juoksulenkki)"), 0, 15);
+		paneeli.add(new Label("Kulutuksesi on:"), 0, 17);
+		paneeli.add(new Label("kcal"), 3, 17);
 
 		// Sukupuolenvalinta
 		ToggleGroup sukupuoliGroup = new ToggleGroup();
@@ -375,8 +357,6 @@ public class GUI extends Application{
 		paneeli.add(btLaskeKulutus, 2, 16);
 		paneeli.add(tfKulutus, 2, 17);
 
-
-
 		// Sijoittelu
 		border.setLeft(vBox);
 		border.setRight(paneeli);
@@ -391,17 +371,22 @@ public class GUI extends Application{
 		window.setScene(scene);
 		window.show();
 	}
-	// Ruoka-aineiden suodatus
+
+	/**
+	 * Ruoka-aineiden suodatus
+	 *
+	 * @param oldValue Vanha arvo
+	 * @param newValue Uusi arvo
+	 */
 	public void etsiButtonClicked(String oldValue, String newValue) {
 		ObservableList<Ruoka> filteredList = FXCollections.observableArrayList();
 		if (filterField == null || (newValue.length() < oldValue.length()) || newValue == null) {
 			table.setItems(ruoat);
-		}
-		else {
+		} else {
 			newValue = newValue.toUpperCase();
-			for(Ruoka ruuat : table.getItems()) {
+			for (Ruoka ruuat : table.getItems()) {
 				String filterFirstName = ruuat.getNimi();
-				if(filterFirstName.toUpperCase().contains(newValue)) {
+				if (filterFirstName.toUpperCase().contains(newValue)) {
 					filteredList.add(ruuat);
 				}
 			}
@@ -409,12 +394,17 @@ public class GUI extends Application{
 		}
 	}
 
-	// Ruoan lisäys tietokantaan
+	/**
+	 * Ruoan lisäys tietokantaan
+	 */
 	public void addButtonClicked() {
 		try {
 			conn = DBconnect.dbConnector();
 			Statement myStmt = conn.createStatement();
-			String query = "INSERT INTO aine(nimi, kcal, proteiini, hiilihydraatti, rasva) VALUES ('" + nameInput.getText() + "', '" + Double.parseDouble(calorieInput.getText()) + "', '" + Double.parseDouble(proteinInput.getText()) + "', '" + Double.parseDouble(carbInput.getText()) + "', '" + Double.parseDouble(fatInput.getText()) + "')"  ;
+			String query = "INSERT INTO aine(nimi, kcal, proteiini, hiilihydraatti, rasva) VALUES ('"
+					+ nameInput.getText() + "', '" + Double.parseDouble(calorieInput.getText()) + "', '"
+					+ Double.parseDouble(proteinInput.getText()) + "', '" + Double.parseDouble(carbInput.getText())
+					+ "', '" + Double.parseDouble(fatInput.getText()) + "')";
 
 			myStmt.executeUpdate(query);
 
@@ -431,7 +421,9 @@ public class GUI extends Application{
 		}
 	}
 
-	//Ruoan poisto tietokannasta
+	/**
+	 * Ruoan poisto tietokannasta
+	 */
 	public void removeButtonClicked() {
 		try {
 			conn = DBconnect.dbConnector();
@@ -450,7 +442,11 @@ public class GUI extends Application{
 		}
 	}
 
-	// Valitsee kaikki ruoat
+	/**
+	 * Valitsee kaikki ruoat
+	 *
+	 * @return ruoat
+	 */
 	public ObservableList<Ruoka> getData() {
 		try {
 			ruoat.clear();
@@ -459,7 +455,8 @@ public class GUI extends Application{
 			ResultSet myRs = myStmt.executeQuery("SELECT * FROM aine");
 
 			while (myRs.next()) {
-				ruoat.add(new Ruoka(myRs.getString("nimi"),myRs.getDouble("kcal"), myRs.getDouble("proteiini"), myRs.getDouble("hiilihydraatti"), myRs.getDouble("rasva")));
+				ruoat.add(new Ruoka(myRs.getString("nimi"), myRs.getDouble("kcal"), myRs.getDouble("proteiini"),
+						myRs.getDouble("hiilihydraatti"), myRs.getDouble("rasva")));
 			}
 			conn.close();
 		} catch (Exception e) {
@@ -468,25 +465,31 @@ public class GUI extends Application{
 		return ruoat;
 	}
 
+	/**
+	 * Laskee henkilön kulutuksen
+	 *
+	 * @param sukupuoliGroup sukupuolen valinta
+	 * @param aktiviteettiGroup aktiivisuuden valinta
+	 */
 	public void laskeKulutusButtonClicked(ToggleGroup sukupuoliGroup, ToggleGroup aktiviteettiGroup) {
 		int kulutus = 0;
 		RadioButton valittuSukupuoliRadio = (RadioButton) sukupuoliGroup.getSelectedToggle();
 		RadioButton valittuAktiviteettiRadio = (RadioButton) aktiviteettiGroup.getSelectedToggle();
-		kulutus = Kulutus.kulutus(valittuSukupuoliRadio.getText(),
-				Double.parseDouble(tfIka.getText()),
-				Double.parseDouble(tfPituus.getText()),
-				Double.parseDouble(tfPaino.getText()),
-				valittuAktiviteettiRadio.getText(),
-				Integer.parseInt(tfKevyt.getText()),
-				Integer.parseInt(tfKohtalainen.getText()),
-				Integer.parseInt(tfKuormittava.getText()),
+		kulutus = Kulutus.kulutus(valittuSukupuoliRadio.getText(), Double.parseDouble(tfIka.getText()),
+				Double.parseDouble(tfPituus.getText()), Double.parseDouble(tfPaino.getText()),
+				valittuAktiviteettiRadio.getText(), Integer.parseInt(tfKevyt.getText()),
+				Integer.parseInt(tfKohtalainen.getText()), Integer.parseInt(tfKuormittava.getText()),
 				Integer.parseInt(tfRaskas.getText()));
 
 		tfKulutus.setText(String.valueOf(kulutus));
 		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " grammaa viikossa");
 	}
 
-	//Päivän ateriat
+	/**
+	 * Hakee päivän ateriat tiedostosta jos olemassa
+	 *
+	 * @return ruokalista tiedostossa olevat ruoat
+	 */
 	public ObservableList<Ruokalista> getDaily() {
 		String FieldDelimeter = ",";
 		BufferedReader br;
@@ -497,7 +500,9 @@ public class GUI extends Application{
 			while ((line = br.readLine()) != null) {
 				String[] fields = line.split(FieldDelimeter);
 
-				Ruokalista record = new Ruokalista(fields[0], fields[1], Double.parseDouble(fields[2]), Double.parseDouble(fields[3]), Double.parseDouble(fields[4]), Double.parseDouble(fields[5]), Double.parseDouble(fields[6]));
+				Ruokalista record = new Ruokalista(fields[0], fields[1], Double.parseDouble(fields[2]),
+						Double.parseDouble(fields[3]), Double.parseDouble(fields[4]), Double.parseDouble(fields[5]),
+						Double.parseDouble(fields[6]));
 				ruokalista.add(record);
 			}
 		} catch (FileNotFoundException ex) {
@@ -509,18 +514,17 @@ public class GUI extends Application{
 		return ruokalista;
 	}
 
-	//Ruoan lisäys päivän aterioihin
+	/**
+	 * Ruoan lisäys päivän aterioihin
+	 */
 	public void lisaaButtonClicked() {
 		double maara = 100;
 		String m;
 		m = String.valueOf(maara);
 
 		Ruoka valittu = table.getSelectionModel().getSelectedItem();
-		Ruokalista val = new Ruokalista(valittu.getNimi(),
-				m,
-				maaraEnergia(valittu.getKalori(), maara),
-				valittu.getKalori(),
-				maaraProteiini(valittu.getProteiini(),maara, maara),
+		Ruokalista val = new Ruokalista(valittu.getNimi(), m, maaraEnergia(valittu.getKalori(), maara),
+				valittu.getKalori(), maaraProteiini(valittu.getProteiini(), maara, maara),
 				maaraHiilihydraatti(valittu.getHiilihydraatti(), maara, maara),
 				maaraRasva(valittu.getRasva(), maara, maara));
 
@@ -528,79 +532,123 @@ public class GUI extends Application{
 		table2.getSelectionModel().clearSelection();
 
 		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
-		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
-		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
-		rasvamaara.setText( "R: " + laskeKokoRasva() );
+		proteiinimaara.setText("P: " + laskeKokoProteiini());
+		hiilarimaara.setText("H: " + laskeKokoHiilihydraatti());
+		rasvamaara.setText("R: " + laskeKokoRasva());
 		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " viikossa");
 	}
 
-	//Ruoan poisto päivän aterioista
+	/**
+	 * Ruoan poisto päivän aterioista
+	 */
 	public void poistaButtonClicked() {
 		ruokalista.removeAll(table2.getSelectionModel().getSelectedItems());
 		table2.getSelectionModel().clearSelection();
 
 		kalorimaar.setText("kaloreita " + laskeKokoEnergia() + " kcal");
-		proteiinimaara.setText( "P: " + laskeKokoProteiini() );
-		hiilarimaara.setText( "H: " + laskeKokoHiilihydraatti() );
-		rasvamaara.setText( "R: " + laskeKokoRasva() );
+		proteiinimaara.setText("P: " + laskeKokoProteiini());
+		hiilarimaara.setText("H: " + laskeKokoHiilihydraatti());
+		rasvamaara.setText("R: " + laskeKokoRasva());
 		kuluttaa.setText("Paino muuttuu noin " + laskeErotus() + " viikossa");
 
 	}
 
-	// Laskee ruoan kalorimäärän annetun määrän perusteella
+	/**
+	 * Laskee ruoan kalorimäärän annetun määrän perusteella ja palauttaa sen
+	 * pyöristettynä kahdella
+	 *
+	 * @param energia ruoan energia
+	 * @param maara ruokamäärä
+	 * @return round pyöristetty energiamäärä
+	 */
 	public double maaraEnergia(double energia, double maara) {
 		// jos 100 g on 50 kcal, niin kuinka monta on kcal on 80g? 140?
 		energia = (energia / 100) * maara;
 
-		double round = Math.round(energia * 100.0)/100.0;
+		double round = Math.round(energia * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Laskee ruoan proteiinimäärän annetun määrän perusteella
+	/**
+	 * Laskee ruoan proteiinimäärän annetun määrän perusteella ja palauttaa sen
+	 * pyöristettynä kahdella
+	 *
+	 * @param proteiini proteiinimäärä
+	 * @param vanhamaara vanha grammamäärä
+	 * @param maara uusi grammamäärä
+	 * @return round uusi proteiinimäärä pyöristettynä kahdella
+	 */
 	public double maaraProteiini(double proteiini, double vanhamaara, double maara) {
-		// jos 100 g on 50 proteiinia, niin kuinka paljon proteiinia on 80g? 140?
+		// jos 100 g on 50 proteiinia, niin kuinka paljon proteiinia on 80g?
+		// 140?
 
 		proteiini = (proteiini * maara) / vanhamaara;
 
-		double round = Math.round(proteiini * 100.0)/100.0;
+		double round = Math.round(proteiini * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Laskee ruoan hiilihydraattimäärän annetun määrän perusteella
+	/**
+	 * Laskee ruoan hiilihydraattimäärän annetun määrän perusteella ja palauttaa
+	 * sen pyöristettynä kahdella
+	 *
+	 * @param hiilari hiilihydraattimäärä
+	 * @param vanhamaara vanha grammamäärä
+	 * @param maara uusi grammamäärä
+	 * @return round uusi hiilihydraattimäärä pyöristettynä kahdella
+	 */
 	public double maaraHiilihydraatti(double hiilari, double vanhamaara, double maara) {
 		// jos 100 g on 50 hiilaria, niin kuinka paljon hiilaria on 80g? 140?
 		hiilari = (hiilari * maara) / vanhamaara;
 
-		double round = Math.round(hiilari * 100.0)/100.0;
+		double round = Math.round(hiilari * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Laskee ruoan rasvamäärän annetun määrän perusteella
+	/**
+	 * Laskee ruoan rasvamäärän annetun määrän perusteella ja palauttaa sen
+	 * pyöristettynä kahdella
+	 *
+	 * @param rasva rasvamäärä
+	 * @param vanhamaara vanha grammamäärä
+	 * @param maara uusi grammamäärä
+	 * @return round uusi rasvamäärä
+	 */
 	public double maaraRasva(double rasva, double vanhamaara, double maara) {
 		// jos 100 g on 50 rasvaa, niin kuinka paljon hiilaria on 80g? 140?
 		rasva = (rasva * maara) / vanhamaara;
 
-		double round = Math.round(rasva * 100.0)/100.0;
+		double round = Math.round(rasva * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Laskee kaikkien päivän ruokien yhteisenergian
+	/**
+	 * Laskee kaikkien päivän ruokien yhteisenergian ja palauttaa sen
+	 * pyöristettynä kahdella
+	 *
+	 * @return round Kaikkien valittujen ruokien energiamäärä (kcal)
+	 */
 	public double laskeKokoEnergia() {
 		double energia = 0;
 
 		for (Ruokalista energiaaa : table2.getItems()) {
 			energia = energia + energiaaa.getEnergia();
 		}
-		double round = Math.round(energia * 100.0)/100.0;
+		double round = Math.round(energia * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Lakee kaikkien päivän ruokien proteiinimäärän
+	/**
+	 * Laskee kaikkien päivän ruokien proteiinimäärän ja palauttaa sen
+	 * pyöristettynä kahdella
+	 *
+	 * @return round Kaikkien valittujen ruokien proteiinimäärä
+	 */
 	public double laskeKokoProteiini() {
 		double proteiini = 0;
 
@@ -609,13 +657,17 @@ public class GUI extends Application{
 			proteiini = proteiini + prode.getProteiini();
 		}
 
-
-		double round = Math.round(proteiini * 100.0)/100.0;
+		double round = Math.round(proteiini * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Laskee kaikkien päivän ruokien hiilihydraattimäärän
+	/**
+	 * Laskee kaikkien päivän ruokien hiilihydraattimäärän ja palauttaa sen
+	 * pyöristettynä kahdella
+	 *
+	 * @return round Kaikkien valittujen ruokien hiilihydraattimäärä
+	 */
 	public double laskeKokoHiilihydraatti() {
 		double hiilihydraatti = 0;
 
@@ -624,12 +676,16 @@ public class GUI extends Application{
 			hiilihydraatti = hiilihydraatti + hiilari.getHiilihydraatti();
 		}
 
-		double round = Math.round(hiilihydraatti * 100.0)/100.0;
+		double round = Math.round(hiilihydraatti * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Laskee kaikkien päivän ruokien rasvamäärän
+	/**
+	 * Laskee kaikkien päivän ruokien rasvamäärän
+	 *
+	 * @return round Kaikkien valittujen ruokien rasvamäärä
+	 */
 	public double laskeKokoRasva() {
 		double rasva = 0;
 
@@ -637,17 +693,22 @@ public class GUI extends Application{
 		for (Ruokalista ras : table2.getItems()) {
 			rasva = rasva + ras.getRasva();
 		}
-		double round = Math.round(rasva * 100.0)/100.0;
+		double round = Math.round(rasva * 100.0) / 100.0;
 
 		return round;
 	}
 
-	// Laskee kulutuksen ja päivän kalorisaannin ja ilmoittaa paljonko henkilö on plussilla/miinuksilla
+	/**
+	 * Laskee kulutuksen ja päivän kalorisaannin ja ilmoittaa paljonko henkilö
+	 * on plussilla/miinuksilla päivässä, eli paljonko paino muuttuu viikossa
+	 *
+	 * @return erotus Nautitun ruokamäärän ja kulutuksen välinen ero
+	 */
 	public Double laskeErotus() {
 		double erotus = 0;
 		double kulutus = 0;
 
-		if (! tfKulutus.getText().trim().isEmpty()) {
+		if (!tfKulutus.getText().trim().isEmpty()) {
 			kulutus = Double.parseDouble(tfKulutus.getText());
 		}
 
@@ -657,12 +718,20 @@ public class GUI extends Application{
 		return erotus;
 	}
 
-	// Tallentaa ruokalistaan lisätyt ruoat
-	// Lisää tähän jos joskus halutaan tiedoston valinta mahdollisuus
+	/**
+	 * Tallentaa ruokalistaan lisätyt ruoat Lisää tähän jos joskus halutaan
+	 * tiedoston valinta mahdollisuus
+	 */
 	public void handleSave() {
 		saveFile(table2.getItems(), file);
 	}
 
+	/**
+	 * Tallenus toiminnallisuus
+	 *
+	 * @param ruokaa tallennettava ruokalista
+	 * @param file tallenettavan tiedoston kohde
+	 */
 	public void saveFile(ObservableList<Ruokalista> ruokaa, File file) {
 		try {
 			BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
@@ -679,6 +748,11 @@ public class GUI extends Application{
 		}
 	}
 
+	/**
+	 * Launch
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
