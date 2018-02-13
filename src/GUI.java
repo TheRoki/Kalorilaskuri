@@ -491,45 +491,21 @@ public class GUI extends Application{
 
 	//Ruoan lisäys päivän aterioihin
 	public void lisaaButtonClicked() {
+		double maara = 100;
+		String m;
+		m = String.valueOf(maara);
+
 		Ruoka valittu = table.getSelectionModel().getSelectedItem();
 		Ruokalista val = new Ruokalista(valittu.getNimi(),
-				"100", 
-				maaraEnergia(valittu.getKalori()),
+				m,
+				maaraEnergia(valittu.getKalori(), maara),
 				valittu.getKalori(),
-				maaraProteiini(valittu.getProteiini()),
-				maaraHiilihydraatti(valittu.getHiilihydraatti()),
-				maaraRasva(valittu.getRasva()));
-		
+				maaraProteiini(valittu.getProteiini(), maara),
+				maaraHiilihydraatti(valittu.getHiilihydraatti(), maara),
+				maaraRasva(valittu.getRasva(), maara));
+
 		ruokalista.addAll(val);
 		table2.getSelectionModel().clearSelection();
-	}
-	// Laskee ruoan kalorimäärän annetun määrän perusteella
-	public double maaraEnergia(double energia) {
-		double maara = 100;
-		energia = energia * maara;
-		
-		return energia;
-	}
-	// Laskee ruoan proteiinimäärän annetun määrän perusteella
-	public double maaraProteiini(double proteiini) {
-		double maara = 100;
-		proteiini = proteiini * maara;
-		
-		return proteiini;
-	}
-	// Laskee ruoan hiilihydraattimäärän annetun määrän perusteella
-	public double maaraHiilihydraatti(double hiilari) {
-		double maara = 100;
-		hiilari = hiilari * maara;
-		
-		return hiilari;
-	}
-	// Laskee ruoan rasvamäärän annetun määrän perusteella
-	public double maaraRasva(double rasva) {
-		double maara = 100;
-		rasva = rasva * maara;
-		
-		return rasva;
 	}
 
 	//Ruoan poisto päivän aterioista
@@ -538,32 +514,61 @@ public class GUI extends Application{
 		table2.getSelectionModel().clearSelection();
 	}
 
-	public double laskeKokoEnergia() {
-		// 1 g proteiinia = 4 kcal
-		// 1 g hiilihydraattia = 4 kcal
-		// 1 g rasvaa = 9 kcal
-		double energia = 0;
-		double proteiini = laskeKokoProteiini();
-		double hiilari = laskeKokoHiilihydraatti();
-		double rasva = laskeKokoRasva();
+	// Laskee ruoan kalorimäärän annetun määrän perusteella
+	public double maaraEnergia(double energia, double maara) {
+		// jos 100 g on 50 kcal, niin kuinka monta on kcal on 80g? 140?
 
-		energia = proteiini * 4;
+		// TODO KAAVA
 
-		energia += hiilari * 4;
-
-		energia += rasva * 9;
+		// joka ei siis ole tämä
+		energia = energia * maara;
 
 		return energia;
 	}
 
-	public double laskeKokoProteiini() {
+	// Laskee ruoan proteiinimäärän annetun määrän perusteella
+	public double maaraProteiini(double proteiini, double maara) {
+		// jos 100 g on 50 proteiinia, niin kuinka paljon proteiinia on 80g? 140?
 
+		// TODO KAAVA
+		proteiini = proteiini * maara;
+
+		return proteiini;
+	}
+
+	// Laskee ruoan hiilihydraattimäärän annetun määrän perusteella
+	public double maaraHiilihydraatti(double hiilari, double maara) {
+		// jos 100 g on 50 hiilaria, niin kuinka paljon hiilaria on 80g? 140?
+
+		// TODO KAAVA
+		hiilari = hiilari * maara;
+
+		return hiilari;
+	}
+
+	// Laskee ruoan rasvamäärän annetun määrän perusteella
+	public double maaraRasva(double rasva, double maara) {
+		// jos 100 g on 50 rasvaa, niin kuinka paljon hiilaria on 80g? 140?
+
+		// TODO KAAVA
+		rasva = rasva * maara;
+
+		return rasva;
+	}
+
+	// Laskee kaikkien päivän ruokien yhteisenergian
+	public double laskeKokoEnergia() {
+
+		double energia = 0;
+
+		return energia;
+	}
+
+	// Lakee kaikkien päivän ruokien proteiinimäärän
+	public double laskeKokoProteiini() {
 		double proteiini = 0;
 
-		// laske proteiini määrästä
-
-
-
+		//TODO
 		// laske proteiini yhteensä
 		//for (Ruokalista prode : table2.getItems()) {
 		//	proteiini = proteiini + prode.getProteiini();
@@ -572,22 +577,29 @@ public class GUI extends Application{
 		return proteiini;
 	}
 
+	// Laskee kaikkien päivän ruokien hiilihydraattimäärän
 	public double laskeKokoHiilihydraatti() {
-
 		double hiilihydraatti = 0;
+
+		//TODO
 
 		return hiilihydraatti;
 	}
 
+	// Laskee kaikkien päivän ruokien rasvamäärän
 	public double laskeKokoRasva() {
-
 		double rasva = 0;
+
+		//TODO
 
 		return rasva;
 	}
 
+	// Laskee kulutuksen ja päivän kalorisaannin ja ilmoittaa paljonko henkilö on plussilla/miinuksilla
 	public Integer laskeErotus() {
 		int erotus = 0;
+
+		//TODO
 
 		return erotus;
 	}
