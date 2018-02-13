@@ -1,21 +1,20 @@
-import javafx.scene.control.ToggleGroup;
 
 /**
- * Kulutus-luokka laskee henkilön päivittäisen kalorikulutuksen annettujen tietojen perusteella
+ * Kulutus-luokka laskee henkilÃ¶n pÃ¤ivittÃ¤isen kalorikulutuksen annettujen tietojen perusteella
  *
  * @author Roope
  * @version 1.00 2017/4/25
  */
 public class Kulutus {
 
-	  /** Metodi palauttaa henkilön kulutuksen.
+	  /** Metodi palauttaa henkilÃ¶n kulutuksen.
 	   *
-	   * @param sukupuoli	henkilön sukupuoli
-	   * @param ika			henkilön ikä
-	   * @param pituus		henkilön pituus
-	   * @param paino		henkilön aamupaino
+	   * @param sukupuoli	henkilÃ¶n sukupuoli
+	   * @param ika			henkilÃ¶n ikÃ¤
+	   * @param pituus		henkilÃ¶n pituus
+	   * @param paino		henkilÃ¶n aamupaino
 	   * @param aktiivisuus
-	   * @param aktiivisuus	henkilön päivän aktiivisuus
+	   * @param aktiivisuus	henkilÃ¶n pÃ¤ivÃ¤n aktiivisuus
 	 * @param kevyt
 	 * @param raskas
 	 * @param kuormittava
@@ -23,10 +22,10 @@ public class Kulutus {
 	   * @param k
 	   * @param j
 	   * @param i
-	   * @return 			henkilön päivän kulutus
+	   * @return 			henkilÃ¶n pÃ¤ivÃ¤n kulutus
 	   * The Harris-Benedict equation revised by Mifflin and St Jeor
-	   * Men = ((10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + 5) × activity level
-	   * Women = ((10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) - 161) × activity level
+	   * Men = ((10 Ã— weight in kg) + (6.25 Ã— height in cm) - (5 Ã— age in years) + 5) Ã— activity level
+	   * Women = ((10 Ã— weight in kg) + (6.25 Ã— height in cm) - (5 Ã— age in years) - 161) Ã— activity level
 	   */
 	  public static int kulutus(String skpuoli, double ika, double pituus, double paino, String aktiivisuus, int kevyt, int kohtalainen, int kuormittava, int raskas) {
 	    int kulutus = 0;
@@ -38,13 +37,13 @@ public class Kulutus {
 			if (aktiivisuus.equals("Todella kevyt (oleilua)")) {
 				bmi = bmi * 1.2;
 			}
-			else if(aktiivisuus.equals("Kevyt (istumatyöskentelyä)")) {
+			else if(aktiivisuus.equals("Kevyt (istumatyÃ¶skentelyÃ¤)")) {
 				bmi = bmi * 1.375;
 			}
 			else if(aktiivisuus.equals("Kohtalainen (seisomista ja liikkumista jonkin verran)")) {
 				bmi = bmi * 1.55;
 			}
-			else if(aktiivisuus.equals("Raskas (fyysisesti raskas työ)")){
+			else if(aktiivisuus.equals("Raskas (fyysisesti raskas tyÃ¶)")){
 				bmi = bmi * 1.725;
 			}
 		}
@@ -55,17 +54,17 @@ public class Kulutus {
 	    	if (aktiivisuus.equals("Todella kevyt (oleilua)")) {
 	    		bmi = bmi * 1.2;
 			}
-			else if(aktiivisuus.equals("Kevyt (istumatyöskentelyä)")) {
+			else if(aktiivisuus.equals("Kevyt (istumatyÃ¶skentelyÃ¤)")) {
 				bmi = bmi * 1.375;
 			}
 			else if(aktiivisuus.equals("Kohtalainen (seisomista ja liikkumista jonkin verran)")) {
 				bmi = bmi * 1.55;
 			}
-			else if(aktiivisuus.equals("Raskas (fyysisesti raskas työ)")){
+			else if(aktiivisuus.equals("Raskas (fyysisesti raskas tyÃ¶)")){
 				bmi = bmi * 1.725;
 			}
 	    }
-		// kulutukseen lisätään päivän liikunta
+		// kulutukseen lisÃ¤tÃ¤Ã¤n pÃ¤ivÃ¤n liikunta
 		kulutus = (int)(bmi + 0.5d);
 
 		// kevyt kuormittaa 170 kcal/h
